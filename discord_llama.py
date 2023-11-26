@@ -34,9 +34,9 @@ def remove_id(text):
 
 # Removes extra formatting from LLM output like \n and double spaces
 def remove_extra_formatting(text):
-    cleaned_text = text.replace("\n", "") # remove newline
-    cleaned_text = cleaned_text.replace("\t", "") # remove tabs
-    cleaned_text = cleaned_text.replace("  ", "") # remove double spaces
+    cleaned_text = text.replace("\n", " ") # remove newline
+    cleaned_text = cleaned_text.replace("\t", " ") # remove tabs
+    cleaned_text = cleaned_text.replace("  ", " ") # remove double spaces
     return cleaned_text
 
 def format_prompt(prompt, user, question, history):
@@ -66,12 +66,13 @@ def llm_response(question):
     
     try:
         response = requests.post(model["llama_endpoint"], headers={"Content-Type": "application/json"}, json=api_data)
-        output = response.json()
+        json_output = response.json()
+        output = json_output['content']
     except:
         output = "My AI model is not responding try again in a moment 🔥🐳"
 
     # remove annoying formatting in output
-    return remove_extra_formatting(output['content'])
+    return remove_extra_formatting(output)
 
 @client.event
 async def on_ready():
