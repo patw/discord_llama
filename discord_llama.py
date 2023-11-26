@@ -64,8 +64,11 @@ def llm_response(question):
         "stop": model["stop_tokens"]
     }
     
-    response = requests.post(model["llama_endpoint"], headers={"Content-Type": "application/json"}, json=api_data)
-    output = response.json()
+    try:
+        response = requests.post(model["llama_endpoint"], headers={"Content-Type": "application/json"}, json=api_data)
+        output = response.json()
+    except:
+        output = "My AI model is not responding try again in a moment 🔥🐳"
 
     # remove annoying formatting in output
     return remove_extra_formatting(output['content'])
