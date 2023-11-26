@@ -1,0 +1,11 @@
+{
+    "discord_token": "<discord bot key goes here>",
+    "identity": "You are a helpful assistant named Wizard, you are an expert in many subjects and provide carefully researched, thoughtful answers",
+    "triggers": ["who", "when", "why", "how", "where"],
+    "trigger_level": 0.25,
+    "temperature": 0.7,
+    "tokens": 512,
+    "history_lines": 5,
+    "question_prompt": "Answer the following question, and only the question from {%U}, think it through carefully: {%Q}\nThis is what was discussed previously: {%H}",
+    "trigger_prompt": "Make a short comment about this statement and only this statement from {%U} and provide a thoughtful response: {%Q}\nThis is what was discussed previously: {%H}"
+}
