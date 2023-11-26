@@ -15,7 +15,7 @@ pip install -r requirements.txt
 We highly recommend OpenHermes 2.5 Mistral-7b fine tune for this task, as it's currently the best (Nov 2023) that
 we've tested personally.  You can find different quantized versions of the model here:
 
-https://huggingface.co/TheBloke/dolphin-2.1-mistral-7B-GGUF/tree/main
+https://huggingface.co/TheBloke/OpenHermes-2.5-Mistral-7B-GGUF/tree/main
 
 I'd suggest the Q6 quant for GPU and Q4_K_M for CPU
 
