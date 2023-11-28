@@ -12,6 +12,9 @@ __pycache__/
 # Make sure not to check in my own bots and leak discord keys like a dumbass
 *.json
 
+# Ignore the custom bots
+runbot-*
+
 # Distribution / packaging
 .Python
 build/

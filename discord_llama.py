@@ -34,9 +34,9 @@ def remove_id(text):
 
 # Removes extra formatting from LLM output like \n and double spaces
 def remove_extra_formatting(text):
-    cleaned_text = text.replace("\n", "") # remove newline
-    cleaned_text = cleaned_text.replace("\t", "") # remove tabs
-    cleaned_text = cleaned_text.replace("  ", "") # remove double spaces
+    cleaned_text = text.replace("\n", " ") # remove newline
+    cleaned_text = cleaned_text.replace("\t", " ") # remove tabs
+    cleaned_text = cleaned_text.replace("  ", " ") # remove double spaces
     return cleaned_text
 
 def format_prompt(prompt, user, question, history):
@@ -66,12 +66,13 @@ def llm_response(question):
     
     try:
         response = requests.post(model["llama_endpoint"], headers={"Content-Type": "application/json"}, json=api_data)
-        output = response.json()
+        json_output = response.json()
+        output = json_output['content']
     except:
         output = "My AI model is not responding try again in a moment 🔥🐳"
 
     # remove annoying formatting in output
-    return remove_extra_formatting(output['content'])
+    return remove_extra_formatting(output)
 
 @client.event
 async def on_ready():
@@ -86,7 +87,7 @@ async def on_message(message):
     
     # Grab the channel history so we can add it as context for replies, makes a nice blob of data
     history_text = ""
-    channel_history = [user async for user in message.channel.history(limit=bot["history_lines"])]
+    channel_history = [user async for user in message.channel.history(limit=bot["history_lines"] + 1)]
     for history in channel_history:
         if remove_id(history.content) != remove_id(message.content):
             history_text = history_text + history.author.name + ": " + remove_id(history.content) + "\n"
@@ -96,6 +97,7 @@ async def on_message(message):
     if client.user.mentioned_in(message):
         prompt = format_prompt(bot["question_prompt"], message.author.name, remove_id(message.content), history_text)
         direct_msg = True
+        print(prompt)
         await message.channel.send(llm_response(prompt))
     
     # Figure out if someone said something we should respond to, besides @message these are configured in the identity.json
@@ -106,8 +108,9 @@ async def on_message(message):
 
     # Bots can respond to trigger words at randomn, this is configured in the identity.json (eg. 0.25 = 25%)
     # But they should not respond if it was a direct message with the triggers in it
-    if comment_on_it and random.random() <= bot["trigger_level"] and direct_msg == False:
+    if comment_on_it and random.random() <= float(bot["trigger_level"]) and direct_msg == False:
         prompt = format_prompt(bot["trigger_prompt"], message.author.name, remove_id(message.content), history_text)
+        print(prompt)
         await message.channel.send(llm_response(prompt))
 
 # Run the main loop
