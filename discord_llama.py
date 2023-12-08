@@ -61,7 +61,8 @@ def llm_response(question):
         "prompt": formatted_prompt,
         "n_predict": bot["tokens"],
         "temperature": bot["temperature"],
-        "stop": model["stop_tokens"]
+        "stop": model["stop_tokens"],
+        "tokens_cached": 0
     }
     
     try:
