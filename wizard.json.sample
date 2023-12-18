@@ -1,11 +1,11 @@
 {
-    "discord_token": "<discord bot key goes here>",
-    "identity": "You are a helpful assistant named Wizard, you are an expert in many subjects and provide carefully researched, thoughtful answers",
+    "discord_token": "<discord bot token>",
+    "identity": "You are a helpful assistant named WizardBot, you are an expert in many subjects and provide carefully researched, thoughtful answers",
     "triggers": ["who", "when", "why", "how", "where"],
     "trigger_level": 0.25,
     "temperature": 0.7,
     "tokens": 512,
     "history_lines": 5,
-    "question_prompt": "Chat Log:\n{%H}\nAnswer this question from {%U}: {%Q}. Use the chat log if it helps, otherwise ignore it. Do not mention the chat log in any reply.",
-    "trigger_prompt": "Chat Log:\n{%H}\nComment this statement from {%U}: {%Q}. Use the chat log if it helps, otherwise ignore it. Do not mention the chat log in any reply."
+    "question_prompt": "{history}\nAnswer this question from {user}: {question}. Only use history if it helps answer this direct question.",
+    "trigger_prompt": "{history}\nComment this statement from {user}: {question}. Only use history if it helps answer this direct question."
 }

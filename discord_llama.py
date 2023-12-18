@@ -4,6 +4,7 @@ import re
 import random
 import json
 import sys
+import time
 
 # Make sure we're starting with a model.json and an identity.json
 if len(sys.argv) != 3:
@@ -32,17 +33,10 @@ client = discord.Client(intents=intents)
 def remove_id(text):
     return re.sub(r'<@\d+>', '', text)
 
-# Removes extra formatting from LLM output like \n and double spaces
-def remove_extra_formatting(text):
-    cleaned_text = text.replace("\n", " ") # remove newline
-    cleaned_text = cleaned_text.replace("\t", " ") # remove tabs
-    cleaned_text = cleaned_text.replace("  ", " ") # remove double spaces
-    return cleaned_text
-
 def format_prompt(prompt, user, question, history):
-    formatted_prompt = prompt.replace("{%U}", user)
-    formatted_prompt = formatted_prompt.replace("{%Q}", question)
-    formatted_prompt = formatted_prompt.replace("{%H}", history)
+    formatted_prompt = prompt.replace("{user}", user)
+    formatted_prompt = formatted_prompt.replace("{question}", question)
+    formatted_prompt = formatted_prompt.replace("{history}", history)
     return formatted_prompt
 
 # Get completion from LLM, uses a REST API call into llama.cpp running in server mode,
@@ -53,10 +47,10 @@ def llm_response(question):
 
     # Format the prompt with the proper ChatML format and control tokens
     # And inject the system prompt for the bot identity
-    formatted_prompt = model["prompt_format"].replace("{%S}", bot["identity"])
+    formatted_prompt = model["prompt_format"].replace("{system}", bot["identity"])
 
     # This is the data that goes to the API call with some cleanup on the question
-    formatted_prompt = formatted_prompt.replace("{%P}", remove_id(question))
+    formatted_prompt = formatted_prompt.replace("{prompt}", remove_id(question))
     api_data = {
         "prompt": formatted_prompt,
         "n_predict": bot["tokens"],
@@ -64,16 +58,24 @@ def llm_response(question):
         "stop": model["stop_tokens"],
         "tokens_cached": 0
     }
-    
-    try:
-        response = requests.post(model["llama_endpoint"], headers={"Content-Type": "application/json"}, json=api_data)
-        json_output = response.json()
-        output = json_output['content']
-    except:
-        output = "My AI model is not responding try again in a moment 🔥🐳"
+
+    retries = 5
+    backoff_factor = 1
+    while retries > 0:
+        try:
+            response = requests.post(model["llama_endpoint"], headers={"Content-Type": "application/json"}, json=api_data)
+            json_output = response.json()
+            output = json_output['content']
+            break
+        except:
+            time.sleep(backoff_factor)
+            backoff_factor *= 2
+            retries -= 1
+            output = "My AI model is not responding try again in a moment 🔥🐳"
+            continue
 
     # remove annoying formatting in output
-    return remove_extra_formatting(output)
+    return output
 
 @client.event
 async def on_ready():
@@ -103,7 +105,6 @@ async def on_message(message):
     if client.user.mentioned_in(message):
         prompt = format_prompt(bot["question_prompt"], message.author.name, remove_id(message.content), history_text)
         direct_msg = True
-        print(prompt)
         await message.channel.send(llm_response(prompt))
     
     # Figure out if someone said something we should respond to, besides @message these are configured in the identity.json
@@ -116,7 +117,6 @@ async def on_message(message):
     # But they should not respond if it was a direct message with the triggers in it
     if comment_on_it and random.random() <= float(bot["trigger_level"]) and direct_msg == False:
         prompt = format_prompt(bot["trigger_prompt"], message.author.name, remove_id(message.content), history_text)
-        print(prompt)
         await message.channel.send(llm_response(prompt))
 
 # Run the main loop
