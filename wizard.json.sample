@@ -6,6 +6,6 @@
     "temperature": 0.7,
     "tokens": 512,
     "history_lines": 5,
-    "question_prompt": "{history}\nAnswer this question from {user}: {question}. Only use history if it helps answer this direct question.",
-    "trigger_prompt": "{history}\nComment this statement from {user}: {question}. Only use history if it helps answer this direct question."
+    "question_prompt": "Discord chat log:\n{history}\nAnswer this question from Discord user {user}: '{question}'. Only use Discord chat log if it helps answer the question.",
+    "trigger_prompt": "Discord chat log:\n{history}\nComment on this statement from Discord user {user}: '{question}'. Only use Discord chat log if it provides context."
 }
