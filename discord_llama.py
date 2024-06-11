@@ -33,6 +33,12 @@ client = discord.Client(intents=intents)
 def remove_id(text):
     return re.sub(r'<@\d+>', '', text)
 
+# Remove any broadcasts
+def filter_mentions(text):
+    pattern = r'[@]?(\b(here|everyone|channel)\b)'
+    filtered_text = re.sub(pattern, '', text)
+    return filtered_text
+
 def format_prompt(prompt, user, question, history):
     formatted_prompt = prompt.replace("{user}", user)
     formatted_prompt = formatted_prompt.replace("{question}", question)
@@ -105,7 +111,7 @@ async def on_message(message):
     if client.user.mentioned_in(message):
         prompt = format_prompt(bot["question_prompt"], message.author.name, remove_id(message.content), history_text)
         direct_msg = True
-        bot_response = llm_response(prompt)
+        bot_response = filter_mentions(llm_response(prompt))
         await message.channel.send(bot_response[:2000])
     
     # Figure out if someone said something we should respond to, besides @message these are configured in the identity.json
@@ -118,7 +124,7 @@ async def on_message(message):
     # But they should not respond if it was a direct message with the triggers in it
     if comment_on_it and random.random() <= float(bot["trigger_level"]) and direct_msg == False:
         prompt = format_prompt(bot["trigger_prompt"], message.author.name, remove_id(message.content), history_text)
-        bot_response = llm_response(prompt)
+        bot_response = filter_mentions(llm_response(prompt))
         await message.channel.send(bot_response[:2000])
 
 # Run the main loop
