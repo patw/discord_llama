@@ -3,3 +3,6 @@
 
 # Discord API
 discord.py
+
+# OpenAI API (yes even for local models)
+openai

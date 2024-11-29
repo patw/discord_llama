@@ -1,8 +1,8 @@
 # Discord Llama
 
-Build discord bots that respond with a locally running llama.cpp server.  This allows you to run your own models, on CPU or GPU
-as long as you have the hardware resources. Bots can be given identies and respond to trigger words.  They can take advantage
-of the discord channel history to act conversational.
+Build discord bots that respond with a locally running llama.cpp server or ollama server.  This allows you to run your own models, on CPU or GPU as long as you have the hardware resources. Bots can be given identies and respond to trigger words.  They can take advantage of the discord channel history to act conversational.
+
+It should also work on any service that has an OpenAI compatible API by changing the model.json to have a valid key and endpoint URL. 
 
 ## Local Installation
 
@@ -12,48 +12,7 @@ pip install -r requirements.txt
 
 ## Downloading an LLM model
 
-We highly recommend OpenHermes 2.5 Mistral-7b fine tune for this task, as it's currently the best (Nov 2023) that
-we've tested personally.  You can find different quantized versions of the model here:
-
-https://huggingface.co/TheBloke/OpenHermes-2.5-Mistral-7B-GGUF/tree/main
-
-I'd suggest the Q6 quant for GPU and Q4_K_M for CPU
-
-## Running a model on llama.cpp in API mode
-
-### Windows
-
-Go to the llama.cpp releases and download either the win-avx2 package for CPU or the cublas for nvidia cards:
-
-https://github.com/ggerganov/llama.cpp/releases
-
-Extract the files out and run the following for nvidia GPUs:
-```
-server.exe -m <model>.gguf -t 4 -c 2048 -ngl 33 --host 0.0.0.0 --port 8086
-```
-
-For CPU only:
-```
-server.exe -m <model>.gguf -c 2048 --host 0.0.0.0 --port 8086
-```
-
-Replace <model> with whatever model you downloaded and put into the llama.cpp directory
-
-### Linux, MacOS or WSL2
- 
-Follow the install instructions for llama.cpp at https://github.com/ggerganov/llama.cpp
-
-Git clone, compile and run the following for GPU:
-```
-./server -m models/<model>.gguf -t 4 -c 2048 -ngl 33 --host 0.0.0.0 --port 8086
-```
-
-For CPU only:
-```
-./server -m models/<model>.gguf -c 2048 --host 0.0.0.0 --port 8086
-```
-
-Replace <model> with whatever model you downloaded and put into the llama.cpp/models directory
+Consult with the llama.cpp or ollama projects for current instructions on how to run in server mode.
 
 ## Running discord bot
 
@@ -69,9 +28,9 @@ python discord_llama.py model.json wizard.json
 ### Configuration Parameters
 
 #### model.json
-* llama_endpoint - Usually localhost, but if you have a dedicated machine to run it on change URL to that one
-* prompt_format - For instruct tuned models, the format provided is ChatML format which works fine with OpenHermes
-* stop_tokens - Stopping token for generation, should match the model's prompt format
+* base_url - This is the url for your ollama or llama.cpp server running the model
+* api_key - This can be anything for local models, as it won't validate. Use a proper API key for other services.
+* model - Model name, used only for running on hosted services.  For llama.cpp or ollama just use anything
 
 #### wizard.json
 * discord_token - The discord token for the bot, you can make one following this:  https://discordpy.readthedocs.io/en/stable/discord.html#discord-intro
@@ -79,7 +38,6 @@ python discord_llama.py model.json wizard.json
 * triggers - These are words the bot will respond to if they show up in any conversation.
 * trigger_level - This is how often the bot will respond to triggers 1.0 = 100%, 0.25 = 25%.  Anything > 0.5 is annoying
 * temperature - This is the LLM temperature which you can think of as the creativity.  0.7 is good for chatbots.
-* tokens - This is the number of words it can output.  You don't want it writing 10 page novels in discord, so keep it low
 * history_lines - This is how much history it can see when answering questions.  Too much and it can get confused.
 * question_prompt - This is the prompt it processes when @ msged a question
 * trigger_prompt - This is the prompt it processes when it's commenting on a trigger word.
