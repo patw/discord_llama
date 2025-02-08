@@ -54,7 +54,7 @@ def split_message(message):
 def llm_local(prompt):
     client = OpenAI(api_key=llm_config["api_key"], base_url=llm_config["base_url"])
     messages=[{"role": "system", "content": bot_config["identity"]},{"role": "user", "content": prompt}]
-    response = client.chat.completions.create(model=llm_config["model"], temperature=bot_config["temperature"], messages=messages)
+    response = client.chat.completions.create(model=llm_config["model"], max_tokens=2000, temperature=bot_config["temperature"], messages=messages)
     return response.choices[0].message.content
 
 @client.event
